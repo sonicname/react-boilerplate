@@ -1,42 +1,59 @@
-import { data, Form, Link, redirect, useNavigation } from "react-router";
+import { dehydrate, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { routeKeyPrefix } from "endpoint-kit/tanstack-query";
+import { Link, useNavigate } from "react-router";
+import { api } from "~/lib/api";
 import { serverApi } from "~/lib/api.server";
+import { getQueryClient, makeQueryClient, routeMutation } from "~/lib/query";
+import { loadTodo, todoQueries } from "../queries";
 import type { Route } from "./+types/[id]";
 
 export function meta({ loaderData }: Route.MetaArgs) {
-  return [{ title: loaderData ? loaderData.todo.title : "Todo" }];
+  return [{ title: loaderData ? loaderData.title : "Todo" }];
 }
 
-// GET /todos/:id  →  GET /api/todos/:id
+// First load (SSR): GET /api/todos/:id in-process; a declared 404 renders the error boundary.
 export async function loader({ request, context, params }: Route.LoaderArgs) {
-  const result = await serverApi({ request, context }).getTodosById({
-    params: { id: params.id },
-  });
-  if (result.ok) return { todo: result.data };
-  // Declared 404: render the error boundary with the API's message.
-  if (result.error._tag === "EndpointError") {
-    throw data(result.error.data.message, { status: result.error.status });
-  }
-  throw result.error;
+  const queryClient = makeQueryClient();
+  const todo = await loadTodo(queryClient, serverApi({ request, context }), params.id);
+  return { title: todo.title, dehydratedState: dehydrate(queryClient) };
 }
 
-// POST /todos/:id  →  PATCH or DELETE /api/todos/:id
-export async function action({ request, context, params }: Route.ActionArgs) {
-  const form = await request.formData();
-  const api = serverApi({ request, context });
-  if (form.get("intent") === "delete") {
-    await api.deleteTodosById.orThrow({ params: { id: params.id } });
-    return redirect("/todos");
-  }
-  await api.patchTodosById.orThrow({
-    params: { id: params.id },
-    body: { done: form.get("done") === "true" },
-  });
-  return null;
+// Client navigations: over HTTP with api, or straight from the cache when the entry is fresh.
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+  const todo = await loadTodo(getQueryClient(), api, params.id);
+  return { title: todo.title };
 }
 
-export default function TodoDetail({ loaderData }: Route.ComponentProps) {
-  const { todo } = loaderData;
-  const busy = useNavigation().state !== "idle";
+export default function TodoDetail({ params }: Route.ComponentProps) {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const detail = todoQueries.detail(api, params.id);
+  const { data: todo } = useQuery(detail);
+  const listKey = routeKeyPrefix(api.getTodos);
+
+  const toggle = useMutation(
+    routeMutation(api.patchTodosById, {
+      onSuccess: (updated) => {
+        queryClient.setQueryData(detail.queryKey, updated);
+        return queryClient.invalidateQueries({ queryKey: listKey });
+      },
+    }),
+  );
+  const remove = useMutation(
+    routeMutation(api.deleteTodosById, {
+      onSuccess: async () => {
+        // Stale but not refetched: this page is leaving (removing the entry now would make its
+        // useQuery fetch the deleted todo again), and a later visit refetches and gets the 404.
+        void queryClient.invalidateQueries({ queryKey: detail.queryKey, refetchType: "none" });
+        await queryClient.invalidateQueries({ queryKey: listKey });
+        await navigate("/todos");
+      },
+    }),
+  );
+  const busy = toggle.isPending || remove.isPending;
+
+  // The loader put the todo in the cache before this renders.
+  if (!todo) return null;
 
   return (
     <main className="container mx-auto max-w-2xl space-y-6 px-4 py-10">
@@ -50,25 +67,31 @@ export default function TodoDetail({ loaderData }: Route.ComponentProps) {
           <time dateTime={todo.createdAt}>{new Date(todo.createdAt).toLocaleDateString()}</time>
         </p>
       </div>
-      <Form method="post" className="flex gap-2">
-        <input type="hidden" name="done" value={String(!todo.done)} />
+      <div className="flex gap-2">
         <button
-          type="submit"
+          type="button"
           disabled={busy}
+          onClick={() => toggle.mutate({ params: { id: params.id }, body: { done: !todo.done } })}
           className="rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-50 disabled:opacity-60 dark:border-gray-700 dark:hover:bg-gray-900"
         >
           {todo.done ? "Mark as open" : "Mark as done"}
         </button>
         <button
-          type="submit"
-          name="intent"
-          value="delete"
+          type="button"
           disabled={busy}
+          onClick={() => remove.mutate({ params: { id: params.id } })}
           className="rounded-lg px-4 py-2 text-red-600 hover:bg-red-50 disabled:opacity-60 dark:text-red-400 dark:hover:bg-red-950"
         >
           Delete
         </button>
-      </Form>
+      </div>
+      {(toggle.error ?? remove.error) && (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+          {(toggle.error ?? remove.error)?._tag === "EndpointError"
+            ? "This todo no longer exists."
+            : "Something went wrong, try again."}
+        </p>
+      )}
     </main>
   );
 }

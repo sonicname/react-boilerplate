@@ -8,6 +8,7 @@ API endpoints live in feature modules, and every API call is typed end to end:
 | [modules-page-routing](https://www.npmjs.com/package/modules-page-routing) | File-based routes for module pages (`modules/*/pages`) and API files (`api/`, `modules/*/api`) |
 | [auto-types-api](https://www.npmjs.com/package/auto-types-api)           | Typed, validated endpoints in API files; generates the client; OpenAPI                    |
 | [endpoint-kit](https://www.npmjs.com/package/endpoint-kit)               | The typed API client used by pages (and anything else)                                    |
+| [TanStack Query](https://tanstack.com/query)                             | Browser cache: SSR prefetch + hydration, `useQuery` / `useMutation` on the typed routes   |
 
 Also included: TypeScript, Tailwind CSS 4, Zod 4, Vite 8.
 
@@ -48,11 +49,13 @@ app/
       pages/[id].tsx            /todos/:id   detail, toggle, delete
       api/index.ts              GET, POST /api/todos
       api/$id.ts                GET, PATCH, DELETE /api/todos/:id
+      queries.ts                Query options shared by loaders, clientLoaders and components
       schemas.ts                Zod schemas shared by API and pages
       todos.server.ts           Data access (server only)
   lib/
     api.server.ts               serverApi(): typed client for loaders/actions (in-process)
     api.ts                      api: typed client for browser code
+    query.tsx                   QueryClient, QueryProvider (hydration), routeMutation()
   api.gen.ts                    generated, git-ignored: typed endpoint-kit routes
   api.gen.server.ts             generated, git-ignored: in-process handlers for serverApi()
 ```
@@ -96,6 +99,47 @@ pages/index.tsx loader ──serverApi().getTodos()──▶ api/index.ts GET �
    ```
 
    In browser code, use `api` from `~/lib/api` (same routes, same-origin `fetch`).
+
+## Client-side data with TanStack Query
+
+`endpoint-kit/tanstack-query` turns a route into query options keyed `[method, path, input]`.
+`api` and `serverApi()` share the generated routes, so a loader and a component that build the
+same input hit the same cache entry. Define the options once per module and pass the client:
+
+```ts
+// app/modules/todos/queries.ts
+export const todoQueries = {
+  list: (client: Client, q: string) => routeQuery(client.getTodos, { query: q ? { q } : {} }),
+  detail: (client: Client, id: string) => routeQuery(client.getTodosById, { params: { id } }),
+};
+```
+
+```ts
+// First load: prefetch in-process, return the cache. QueryProvider (root.tsx) hydrates it.
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const queryClient = makeQueryClient();
+  await queryClient.query(todoQueries.list(serverApi({ request, context }), q));
+  return { q, dehydratedState: dehydrate(queryClient) };
+}
+
+// Client navigations: HTTP through `api`, or the cache while it is fresh (staleTime: 60s).
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
+  await getQueryClient().query(todoQueries.list(api, q));
+  return { q };
+}
+
+// Component: typed data and errors (declared errors included).
+const { data } = useQuery(todoQueries.list(api, q));
+const create = useMutation(
+  routeMutation(api.postTodos, {
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: routeKeyPrefix(api.getTodos) }),
+  }),
+);
+```
+
+Build inputs only through the shared options: `{ params: { id: "1" } }` and `{ params: { id: 1 } }`
+(or `{ query: {} }` and no query) are different keys, even though the API accepts both. In dev,
+the React Query Devtools (bottom corner) show the cache.
 
 ## Adding a module
 
