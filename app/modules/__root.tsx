@@ -1,4 +1,15 @@
-import { NavLink, Outlet } from "react-router";
+import {
+  ActionIcon,
+  Anchor,
+  Box,
+  Button,
+  Container,
+  Group,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from "@mantine/core";
+import { IconMoon, IconSun } from "@tabler/icons-react";
+import { Link, Outlet, useMatch } from "react-router";
 
 const links = [
   { to: "/", label: "Home", end: true },
@@ -8,32 +19,59 @@ const links = [
 // Shared layout of every module page (wired in app/routes.ts).
 export default function RootLayout() {
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-gray-200 dark:border-gray-800">
-        <nav className="container mx-auto flex items-center gap-6 px-4 py-3 text-sm">
-          {links.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                isActive
-                  ? "font-semibold text-blue-700 dark:text-blue-400"
-                  : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-          <a
-            href="/api/openapi"
-            className="ml-auto text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-          >
-            OpenAPI
-          </a>
-        </nav>
-      </header>
+    <>
+      <Box component="header" style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
+        <Container component="nav" size="lg" py="xs">
+          <Group gap="xs">
+            {links.map((link) => (
+              <NavItem key={link.to} {...link} />
+            ))}
+            <Anchor href="/api/openapi" size="sm" c="dimmed" ml="auto">
+              OpenAPI
+            </Anchor>
+            <ColorSchemeToggle />
+          </Group>
+        </Container>
+      </Box>
       <Outlet />
-    </div>
+    </>
+  );
+}
+
+function NavItem({ to, label, end }: (typeof links)[number]) {
+  const active = useMatch({ path: to, end }) !== null;
+  return (
+    <Button
+      component={Link}
+      to={to}
+      variant={active ? "light" : "subtle"}
+      color={active ? undefined : "gray"}
+      size="compact-sm"
+      aria-current={active ? "page" : undefined}
+    >
+      {label}
+    </Button>
+  );
+}
+
+function ColorSchemeToggle() {
+  const { setColorScheme } = useMantineColorScheme();
+  // The server does not know the scheme: read it after hydration, and let CSS pick the icon
+  // (lightHidden / darkHidden) so the server HTML and the first client render match.
+  const computed = useComputedColorScheme("light", { getInitialValueInEffect: true });
+  return (
+    <ActionIcon
+      variant="default"
+      size="lg"
+      aria-label="Toggle color scheme"
+      onClick={() => setColorScheme(computed === "light" ? "dark" : "light")}
+    >
+      <Box component="span" darkHidden>
+        <IconMoon size={18} stroke={1.5} />
+      </Box>
+      <Box component="span" lightHidden>
+        <IconSun size={18} stroke={1.5} />
+      </Box>
+    </ActionIcon>
   );
 }

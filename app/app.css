@@ -1,15 +1,18 @@
+/*
+ * Cascade layers, lowest first: Tailwind's preflight (base) sits under Mantine, so it never
+ * resets Mantine components, and Tailwind utilities sit over it, so `className="mt-4"` still
+ * wins on a Mantine component.
+ */
+@layer theme, base, mantine, components, utilities;
+
 @import "tailwindcss";
+@import "@mantine/core/styles.layer.css";
+@import "@mantine/notifications/styles.layer.css";
+
+/* `dark:` follows Mantine's color scheme (toggle in the header) instead of the OS setting. */
+@custom-variant dark (&:where([data-mantine-color-scheme="dark"], [data-mantine-color-scheme="dark"] *));
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
 }

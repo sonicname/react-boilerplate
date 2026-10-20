@@ -11,8 +11,12 @@
     "routes:check": "modules-page-routing validate"
   },
   "dependencies": {
+    "@mantine/core": "^9.7.3",
+    "@mantine/hooks": "^9.7.3",
+    "@mantine/notifications": "^9.7.3",
     "@react-router/node": "^8.4.0",
     "@react-router/serve": "^8.4.0",
+    "@tabler/icons-react": "^3.49.0",
     "@tanstack/react-query": "^5.104.4",
     "auto-types-api": "^0.0.2",
     "endpoint-kit": "^0.2.0",
@@ -30,6 +34,9 @@
     "@types/node": "^22",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "postcss": "^8.5.31",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.3",

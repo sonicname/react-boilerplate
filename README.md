@@ -9,8 +9,9 @@ API endpoints live in feature modules, and every API call is typed end to end:
 | [auto-types-api](https://www.npmjs.com/package/auto-types-api)           | Typed, validated endpoints in API files; generates the client; OpenAPI                    |
 | [endpoint-kit](https://www.npmjs.com/package/endpoint-kit)               | The typed API client used by pages (and anything else)                                    |
 | [TanStack Query](https://tanstack.com/query)                             | Browser cache: SSR prefetch + hydration, `useQuery` / `useMutation` on the typed routes   |
+| [Mantine](https://mantine.dev)                                           | UI components, notifications, light/dark color scheme (SSR safe, no runtime CSS-in-JS)    |
 
-Also included: TypeScript, Tailwind CSS 4, Zod 4, Vite 8.
+Also included: TypeScript, Tailwind CSS 4, Zod 4, Vite 8, Tabler icons.
 
 ## Getting started
 
@@ -36,13 +37,14 @@ Open `/todos` for the example module and `/api/openapi` for the generated API de
 
 ```text
 app/
-  root.tsx                      Document shell, global error boundary
+  root.tsx                      Document shell (MantineProvider, ColorSchemeScript), error boundary
+  app.css                       Tailwind + Mantine styles and their cascade layer order
   routes.ts                     Builds the routes from the file system (modules-page-routing)
   api/                          App-wide API routes      → /api/...
     health.ts                   GET /api/health
     openapi.ts                  GET /api/openapi (OpenAPI 3.1 from the endpoint schemas)
   modules/
-    __root.tsx                  Layout shared by module pages (nav)
+    __root.tsx                  Layout shared by module pages (nav, color scheme toggle)
     __homepage.tsx              /
     todos/                      Example feature module
       pages/index.tsx           /todos       list, search, create
@@ -56,6 +58,7 @@ app/
     api.server.ts               serverApi(): typed client for loaders/actions (in-process)
     api.ts                      api: typed client for browser code
     query.tsx                   QueryClient, QueryProvider (hydration), routeMutation()
+    theme.ts                    Mantine theme
   api.gen.ts                    generated, git-ignored: typed endpoint-kit routes
   api.gen.server.ts             generated, git-ignored: in-process handlers for serverApi()
 ```
@@ -140,6 +143,26 @@ const create = useMutation(
 Build inputs only through the shared options: `{ params: { id: "1" } }` and `{ params: { id: 1 } }`
 (or `{ query: {} }` and no query) are different keys, even though the API accepts both. In dev,
 the React Query Devtools (bottom corner) show the cache.
+
+## UI with Mantine
+
+Mantine ships plain CSS (no runtime CSS-in-JS), so components render the same on the server and
+in the browser. The setup lives in `app/root.tsx`, `app/app.css` and `postcss.config.js`:
+
+- **Color scheme**: `defaultColorScheme="auto"` follows the OS until the user picks one with the
+  header toggle (saved in `localStorage`). `ColorSchemeScript` applies it before the first paint,
+  so SSR pages never flash the wrong theme. In components, render both variants and hide one with
+  `lightHidden` / `darkHidden` instead of branching on the scheme, which the server cannot know.
+- **Tailwind alongside**: `app.css` orders the cascade layers `theme, base, mantine, components,
+  utilities`. Tailwind's reset never touches Mantine components, and utilities still override
+  them (`<Button className="mt-4">`). The `dark:` variant follows Mantine's scheme.
+- **Notifications**: `notifications.show({ message })` from anywhere, e.g. a mutation's `onSuccess`.
+- **Theme**: edit `app/lib/theme.ts` ([theme object](https://mantine.dev/theming/theme-object/)).
+- **CSS modules**: `*.module.css` files can use Mantine's mixins (`@mixin dark`, `@mixin hover`,
+  `rem()`, `$mantine-breakpoint-md`) through `postcss-preset-mantine`.
+
+More packages plug into the same provider: `@mantine/form`, `@mantine/dates`, `@mantine/modals`,
+`@mantine/charts`, `@mantine/spotlight` (import each one's `styles.layer.css` in `app.css`).
 
 ## Adding a module
 

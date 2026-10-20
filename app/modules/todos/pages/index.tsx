@@ -1,4 +1,19 @@
 import {
+  Badge,
+  Button,
+  Container,
+  Group,
+  Loader,
+  Paper,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+  UnstyledButton,
+} from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { IconSearch } from '@tabler/icons-react';
+import {
   dehydrate,
   useMutation,
   useQuery,
@@ -40,11 +55,13 @@ export default function Todos({ loaderData }: Route.ComponentProps) {
   const { data: todos = [], isFetching } = useQuery(todoQueries.list(api, q));
   const create = useMutation(
     routeMutation(api.postTodos, {
-      // Every cached list (any search) may now be missing the new todo.
-      onSuccess: () =>
-        queryClient.invalidateQueries({
+      onSuccess: (todo) => {
+        notifications.show({ color: 'green', message: `Added "${todo.title}"` });
+        // Every cached list (any search) may now be missing the new todo.
+        return queryClient.invalidateQueries({
           queryKey: routeKeyPrefix(api.getTodos),
-        }),
+        });
+      },
     }),
   );
 
@@ -60,82 +77,82 @@ export default function Todos({ loaderData }: Route.ComponentProps) {
   })();
 
   return (
-    <main className='container mx-auto max-w-2xl space-y-6 px-4 py-10'>
-      <div className='flex items-baseline justify-between'>
-        <h1 className='text-2xl font-semibold'>Todos</h1>
-        {isFetching && (
-          <span className='text-xs text-gray-500'>Refreshing...</span>
-        )}
-      </div>
+    <Container component='main' size='sm' py='xl'>
+      <Stack gap='lg'>
+        <Group justify='space-between'>
+          <Title order={1} size='h2'>
+            Todos
+          </Title>
+          {isFetching && <Loader size='xs' aria-label='Refreshing' />}
+        </Group>
 
-      <Form method='get' role='search'>
-        <input
-          name='q'
-          type='search'
-          defaultValue={q}
-          placeholder='Search todos'
-          aria-label='Search todos'
-          className='w-full rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900'
-        />
-      </Form>
+        <Form method='get' role='search'>
+          <TextInput
+            name='q'
+            type='search'
+            defaultValue={q}
+            placeholder='Search todos'
+            aria-label='Search todos'
+            leftSection={<IconSearch size={16} />}
+          />
+        </Form>
 
-      <form
-        className='flex gap-2'
-        onSubmit={(event) => {
-          event.preventDefault();
-          const form = event.currentTarget;
-          const title = String(new FormData(form).get('title') ?? '');
-          create.mutate({ body: { title } }, { onSuccess: () => form.reset() });
-        }}
-      >
-        <input
-          name='title'
-          placeholder='What needs doing?'
-          aria-label='New todo'
-          aria-invalid={createError ? true : undefined}
-          className='flex-1 rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900'
-        />
-        <button
-          type='submit'
-          disabled={create.isPending}
-          className='rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-60'
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const title = String(new FormData(form).get('title') ?? '');
+            create.mutate({ body: { title } }, { onSuccess: () => form.reset() });
+          }}
         >
-          {create.isPending ? 'Adding...' : 'Add'}
-        </button>
-      </form>
-      {createError && (
-        <p role='alert' className='text-sm text-red-600 dark:text-red-400'>
-          {createError}
-        </p>
-      )}
+          <Group align='flex-start' gap='xs'>
+            <TextInput
+              name='title'
+              placeholder='What needs doing?'
+              aria-label='New todo'
+              error={createError}
+              style={{ flex: 1 }}
+            />
+            <Button type='submit' loading={create.isPending}>
+              Add
+            </Button>
+          </Group>
+        </form>
 
-      {todos.length === 0 ? (
-        <p className='text-gray-500'>
-          {q ? `No todos match "${q}".` : 'Nothing to do yet.'}
-        </p>
-      ) : (
-        <ul className='divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800'>
-          {todos.map((todo) => (
-            <li key={todo.id}>
-              <Link
-                to={`/todos/${todo.id}`}
-                className='flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-900'
-              >
-                <span
-                  className={
-                    todo.done ? 'text-gray-400 line-through' : undefined
+        {todos.length === 0 ? (
+          <Text c='dimmed'>
+            {q ? `No todos match "${q}".` : 'Nothing to do yet.'}
+          </Text>
+        ) : (
+          <Paper withBorder component='ul' p={0} m={0} style={{ listStyle: 'none' }}>
+            {todos.map((todo, index) => (
+              <li key={todo.id}>
+                <UnstyledButton
+                  component={Link}
+                  to={`/todos/${todo.id}`}
+                  display='flex'
+                  w='100%'
+                  px='md'
+                  py='sm'
+                  className='items-center justify-between hover:bg-(--mantine-color-default-hover)'
+                  style={
+                    index > 0
+                      ? { borderTop: '1px solid var(--mantine-color-default-border)' }
+                      : undefined
                   }
                 >
-                  {todo.title}
-                </span>
-                <span className='text-xs text-gray-500'>
-                  {todo.done ? 'Done' : 'Open'}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+                  <Text td={todo.done ? 'line-through' : undefined} c={todo.done ? 'dimmed' : undefined}>
+                    {todo.title}
+                  </Text>
+                  <Badge variant='light' color={todo.done ? 'gray' : 'blue'}>
+                    {todo.done ? 'Done' : 'Open'}
+                  </Badge>
+                </UnstyledButton>
+              </li>
+            ))}
+          </Paper>
+        )}
+      </Stack>
+    </Container>
   );
 }

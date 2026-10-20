@@ -1,3 +1,5 @@
+import { Code, ColorSchemeScript, Container, MantineProvider, mantineHtmlProps, Text, Title } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import {
   isRouteErrorResponse,
   Links,
@@ -9,6 +11,7 @@ import {
 
 import type { Route } from "./+types/root";
 import { QueryProvider } from "./lib/query";
+import { theme } from "./lib/theme";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -24,17 +27,23 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+// The color scheme lives in localStorage, which the server cannot read: ColorSchemeScript sets it
+// on <html> before the first paint (no flash), and mantineHtmlProps silences the attribute mismatch.
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <ColorSchemeScript defaultColorScheme="auto" />
         <Meta />
         <Links />
       </head>
       <body>
-        {children}
+        <MantineProvider theme={theme} defaultColorScheme="auto">
+          <Notifications />
+          {children}
+        </MantineProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -67,14 +76,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
+    <Container component="main" pt={64} pb="md">
+      <Title>{message}</Title>
+      <Text mt="xs">{details}</Text>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
+        <Code block mt="md">
+          {stack}
+        </Code>
       )}
-    </main>
+    </Container>
   );
 }
