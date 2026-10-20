@@ -2,6 +2,7 @@ import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { autoTypesApi } from "auto-types-api/vite";
 import { defineConfig } from "vite";
+import devtoolsJson from "vite-plugin-devtools-json";
 
 export default defineConfig({
   plugins: [
@@ -10,6 +11,9 @@ export default defineConfig({
     autoTypesApi(),
     tailwindcss(),
     reactRouter(),
+    // Serves /.well-known/appspecific/com.chrome.devtools.json in dev so Chrome DevTools
+    // can map the project as a workspace (and React Router stops logging "No route matches").
+    devtoolsJson(),
   ],
   resolve: {
     tsconfigPaths: true,

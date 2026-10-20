@@ -221,6 +221,9 @@ importers:
       vite:
         specifier: ^8.0.3
         version: 8.3.4(@types/node@22.20.5)(jiti@2.7.0)
+      vite-plugin-devtools-json:
+        specifier: ^1.1.2
+        version: 1.1.2(vite@8.3.4(@types/node@22.20.5)(jiti@2.7.0))
 
 packages:
 
@@ -1270,6 +1273,10 @@ packages:
     peerDependencies:
       browserslist: '>= 4.21.0'
 
+  uuid@14.0.3:
+    resolution: {integrity: sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==}
+    hasBin: true
+
   valibot@1.5.0:
     resolution: {integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==}
     peerDependencies:
@@ -1281,6 +1288,11 @@ packages:
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
+
+  vite-plugin-devtools-json@1.1.2:
+    resolution: {integrity: sha512-C8AdDdRniqUxA1XT2Gqny/j3hGFx5NwlfJPVEvdMVo1qeO/44Ado361sLm3DDwNxPLZnPHQHgeEIMULl7dN9Pw==}
+    peerDependencies:
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
 
   vite@8.3.4:
     resolution: {integrity: sha512-IftLE8phJhdNRIGNEV4JCCvfNScoZQVfcXaN8TQropWGJtOHcu+iAB9pHcuGvmEb/kddw0LBe/jS8ztdC6xdiQ==}
@@ -2283,11 +2295,18 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
+  uuid@14.0.3: {}
+
   valibot@1.5.0(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 
   vary@1.1.2: {}
+
+  vite-plugin-devtools-json@1.1.2(vite@8.3.4(@types/node@22.20.5)(jiti@2.7.0)):
+    dependencies:
+      uuid: 14.0.3
+      vite: 8.3.4(@types/node@22.20.5)(jiti@2.7.0)
 
   vite@8.3.4(@types/node@22.20.5)(jiti@2.7.0):
     dependencies:
