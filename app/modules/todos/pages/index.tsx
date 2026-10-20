@@ -7,19 +7,19 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "Todos" }];
 }
 
-// GET /todos?q=...  →  GET /api/todos/items?q=... (in-process, typed)
+// GET /todos?q=...  →  GET /api/todos?q=... (in-process, typed)
 export async function loader({ request, context }: Route.LoaderArgs) {
   const q = new URL(request.url).searchParams.get("q") ?? "";
-  const todos = await serverApi({ request, context }).getTodosItems.orThrow({
+  const todos = await serverApi({ request, context }).getTodos.orThrow({
     query: q ? { q } : {},
   });
   return { todos, q };
 }
 
-// POST /todos  →  POST /api/todos/items
+// POST /todos  →  POST /api/todos
 export async function action({ request, context }: Route.ActionArgs) {
   const form = await request.formData();
-  const { error } = await serverApi({ request, context }).postTodosItems({
+  const { error } = await serverApi({ request, context }).postTodos({
     body: { title: String(form.get("title") ?? "") },
   });
   if (!error) return { error: null };

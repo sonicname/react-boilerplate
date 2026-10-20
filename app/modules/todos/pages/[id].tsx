@@ -6,9 +6,9 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return [{ title: loaderData ? loaderData.todo.title : "Todo" }];
 }
 
-// GET /todos/:id  →  GET /api/todos/items/:id
+// GET /todos/:id  →  GET /api/todos/:id
 export async function loader({ request, context, params }: Route.LoaderArgs) {
-  const result = await serverApi({ request, context }).getTodosItemsById({
+  const result = await serverApi({ request, context }).getTodosById({
     params: { id: params.id },
   });
   if (result.ok) return { todo: result.data };
@@ -19,15 +19,15 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   throw result.error;
 }
 
-// POST /todos/:id  →  PATCH or DELETE /api/todos/items/:id
+// POST /todos/:id  →  PATCH or DELETE /api/todos/:id
 export async function action({ request, context, params }: Route.ActionArgs) {
   const form = await request.formData();
   const api = serverApi({ request, context });
   if (form.get("intent") === "delete") {
-    await api.deleteTodosItemsById.orThrow({ params: { id: params.id } });
+    await api.deleteTodosById.orThrow({ params: { id: params.id } });
     return redirect("/todos");
   }
-  await api.patchTodosItemsById.orThrow({
+  await api.patchTodosById.orThrow({
     params: { id: params.id },
     body: { done: form.get("done") === "true" },
   });

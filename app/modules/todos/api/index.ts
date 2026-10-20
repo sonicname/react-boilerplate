@@ -3,7 +3,7 @@ import { z } from "zod";
 import { NewTodo, Problem, Todo } from "../schemas";
 import { createTodo, findTodoByTitle, listTodos } from "../todos.server";
 
-// GET /api/todos/items?q=read&done=false
+// GET /api/todos?q=read&done=false
 const GET = api.get(
   {
     query: z.object({ q: z.string().optional(), done: z.boolean().optional() }),
@@ -14,7 +14,7 @@ const GET = api.get(
   ({ query }) => listTodos(query),
 );
 
-// POST /api/todos/items  { title }
+// POST /api/todos  { title }
 const POST = api.post(
   { body: NewTodo, response: Todo, errors: { 409: Problem }, summary: "Create a todo", tags: ["todos"] },
   ({ body, error }) => {

@@ -1,0 +1,3 @@
+minimumReleaseAgeExclude:
+  - auto-types-api@0.0.2
+  - modules-page-routing@0.2.0

@@ -46,8 +46,8 @@ app/
     todos/                      Example feature module
       pages/index.tsx           /todos       list, search, create
       pages/[id].tsx            /todos/:id   detail, toggle, delete
-      api/items.ts              GET, POST /api/todos/items
-      api/items.$id.ts          GET, PATCH, DELETE /api/todos/items/:id
+      api/index.ts              GET, POST /api/todos
+      api/$id.ts                GET, PATCH, DELETE /api/todos/:id
       schemas.ts                Zod schemas shared by API and pages
       todos.server.ts           Data access (server only)
   lib/
@@ -60,7 +60,7 @@ app/
 ## How a request flows
 
 ```text
-pages/index.tsx loader ──serverApi().getTodosItems()──▶ api/items.ts GET ──▶ todos.server.ts
+pages/index.tsx loader ──serverApi().getTodos()──▶ api/index.ts GET ──▶ todos.server.ts
         (typed input/output)          (in-process, no HTTP)   (validated by Zod)
 ```
 
@@ -68,7 +68,7 @@ pages/index.tsx loader ──serverApi().getTodosItems()──▶ api/items.ts G
    the route's `loader` / `action`:
 
    ```ts
-   // app/modules/todos/api/items.$id.ts  →  /api/todos/items/:id
+   // app/modules/todos/api/$id.ts  →  /api/todos/:id
    const GET = api.get(
      { params, response: Todo, errors: { 404: Problem } },
      ({ params, error }) => findTodo(params.id) ?? error(404, { message: "Not found" }),
@@ -82,13 +82,13 @@ pages/index.tsx loader ──serverApi().getTodosItems()──▶ api/items.ts G
    together with everything only they use (handlers, schemas, `.server` modules).
 
 2. **Generate**: the `autoTypesApi()` Vite plugin (and `pnpm typecheck`) writes `app/api.gen.ts`,
-   one typed endpoint-kit route per endpoint (`getTodosItemsById`, `patchTodosItemsById`, ...).
+   one typed endpoint-kit route per endpoint (`getTodosById`, `patchTodosById`, ...).
 
 3. **Call** it from loaders and actions with full types, including declared errors:
 
    ```ts
    export async function loader({ request, context, params }: Route.LoaderArgs) {
-     const result = await serverApi({ request, context }).getTodosItemsById({ params: { id: params.id } });
+     const result = await serverApi({ request, context }).getTodosById({ params: { id: params.id } });
      if (result.ok) return { todo: result.data };
      if (result.error._tag === "EndpointError") throw data(result.error.data.message, { status: 404 });
      throw result.error;
@@ -101,14 +101,11 @@ pages/index.tsx loader ──serverApi().getTodosItems()──▶ api/items.ts G
 
 1. Create `app/modules/<name>/pages/index.tsx` → `/<name>` (see the
    [file naming conventions](https://www.npmjs.com/package/modules-page-routing)).
-2. Add API files under `app/modules/<name>/api/` → `/api/<name>/...`. Every `.ts` file there is a
-   route, so put shared code next to it (`schemas.ts`, `*.server.ts`), not inside it.
-3. Run `pnpm dev` (or `pnpm typecheck`): the new endpoints appear on `serverApi()` and `api`.
-
-Note: modules-page-routing 0.1.x maps API file names to URL segments and has no `index.ts`
-convention, so a module's collection endpoint needs a name (`api/items.ts` → `/api/todos/items`).
-The next modules-page-routing release maps `api/index.ts` to the module root; once it is
-installed, `api/index.ts` + `api/$id.ts` give `/api/todos` and `/api/todos/:id`.
+2. Add API files under `app/modules/<name>/api/` → `/api/<name>/...`: `index.ts` is the module
+   root (`/api/<name>`), `$id.ts` → `/api/<name>/:id`, `stats.ts` → `/api/<name>/stats`. Every
+   `.ts` file there is a route, so put shared code next to it (`schemas.ts`, `*.server.ts`).
+3. Run `pnpm dev` (or `pnpm typecheck`): the new endpoints appear on `serverApi()` and `api`,
+   named after method and URL (`GET /api/<name>/:id` → `get<Name>ById`).
 
 ## Deployment
 

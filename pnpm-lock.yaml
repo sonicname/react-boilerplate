@@ -173,8 +173,8 @@ importers:
         specifier: ^8.4.0
         version: 8.4.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(typescript@5.9.3)
       auto-types-api:
-        specifier: ^0.0.1
-        version: 0.0.1(endpoint-kit@0.2.0)(modules-page-routing@0.1.24(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1))
+        specifier: ^0.0.2
+        version: 0.0.2(endpoint-kit@0.2.0)(modules-page-routing@0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1))
       endpoint-kit:
         specifier: ^0.2.0
         version: 0.2.0
@@ -182,8 +182,8 @@ importers:
         specifier: ^5.1.36
         version: 5.2.2
       modules-page-routing:
-        specifier: ^0.1.24
-        version: 0.1.24(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
+        specifier: ^0.2.0
+        version: 0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
       react:
         specifier: ^19.2.8
         version: 19.3.1
@@ -576,8 +576,8 @@ packages:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
     engines: {node: '>= 0.6'}
 
-  auto-types-api@0.0.1:
-    resolution: {integrity: sha512-ONgwYjkh29p/0ssj8B55hLVM5cEGt7KfxVsQ8f18mYd7wc9V2Qz5sWT3+obxAAJcosihYUqetQehKtHLEDpsZw==}
+  auto-types-api@0.0.2:
+    resolution: {integrity: sha512-5iyPOK+X/6L4xktN0vFKNMVtkVBkz6gsZEVw4QvxIYAjs4RT4+yJkxjJY+EIlezQRqxjATO1Xrt7f6cEzdjYpg==}
     engines: {node: '>=20'}
     hasBin: true
     peerDependencies:
@@ -1040,8 +1040,9 @@ packages:
     resolution: {integrity: sha512-Lbgzdk0h4juoQ9fCKXW4by0UJqj+nOOrI9MJ1sSj4nI8aI2eo1qmvQEie4VD1glsS250n15LsWsYtCugiStS5A==}
     engines: {node: '>=18'}
 
-  modules-page-routing@0.1.24:
-    resolution: {integrity: sha512-zCEwCPl4L94nINtAfCslXyBxklaD5ttJN8VYkyxUpMOM6hS8aVV2jDvtCxlb3l+H48qWYIxqmSErknDialfw6w==}
+  modules-page-routing@0.2.0:
+    resolution: {integrity: sha512-1Jfl9Mg7M+HrPShnWh81Q57/vJd0A7LiIiHpgFQ/xsI5hMhig7UyUzy+zEjOmkZieSz4mW5oSk0Bp4NSPs0x8g==}
+    engines: {node: '>=20'}
     hasBin: true
     peerDependencies:
       react: ^18.3.1 || ^19.0.0
@@ -1655,11 +1656,11 @@ snapshots:
       mime-types: 3.0.2
       negotiator: 1.1.0
 
-  auto-types-api@0.0.1(endpoint-kit@0.2.0)(modules-page-routing@0.1.24(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)):
+  auto-types-api@0.0.2(endpoint-kit@0.2.0)(modules-page-routing@0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)):
     dependencies:
       endpoint-kit: 0.2.0
     optionalDependencies:
-      modules-page-routing: 0.1.24(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
+      modules-page-routing: 0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
 
   babel-dead-code-elimination@1.0.12:
     dependencies:
@@ -2041,7 +2042,7 @@ snapshots:
     dependencies:
       mime-db: 1.54.0
 
-  modules-page-routing@0.1.24(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1):
+  modules-page-routing@0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1):
     dependencies:
       react: 19.3.1
       react-router: 8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)

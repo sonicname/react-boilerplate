@@ -8,7 +8,7 @@ import { localFetch } from "~/api.gen.server";
  *
  * @example
  * export async function loader({ request, context }: Route.LoaderArgs) {
- *   return serverApi({ request, context }).getTodosItems.orThrow();
+ *   return serverApi({ request, context }).getTodos.orThrow();
  * }
  */
 export function serverApi(args: { request: Request; context?: unknown }) {
