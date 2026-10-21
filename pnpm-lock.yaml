@@ -188,11 +188,11 @@ importers:
         specifier: ^5.104.4
         version: 5.104.4(@types/react@19.3.0)(react@19.3.1)
       auto-types-api:
-        specifier: ^0.0.2
-        version: 0.0.2(endpoint-kit@0.2.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1)))(modules-page-routing@0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1))
+        specifier: ^0.1.0
+        version: 0.1.0(endpoint-kit@0.3.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1)))(modules-page-routing@0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1))
       endpoint-kit:
-        specifier: ^0.2.0
-        version: 0.2.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1))
+        specifier: ^0.3.0
+        version: 0.3.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1))
       isbot:
         specifier: ^5.1.36
         version: 5.2.2
@@ -779,13 +779,13 @@ packages:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
     engines: {node: '>= 0.6'}
 
-  auto-types-api@0.0.2:
-    resolution: {integrity: sha512-5iyPOK+X/6L4xktN0vFKNMVtkVBkz6gsZEVw4QvxIYAjs4RT4+yJkxjJY+EIlezQRqxjATO1Xrt7f6cEzdjYpg==}
+  auto-types-api@0.1.0:
+    resolution: {integrity: sha512-/Qvp46jxp3oqrMykmjDfwrbmpQ0PbFX6Jij+GRtv10CQ+JJf34+vZk+KEhyOfwGY/0ux7wo33xnPcRKALdU0sA==}
     engines: {node: '>=20'}
     hasBin: true
     peerDependencies:
-      endpoint-kit: ^0.2.0
-      modules-page-routing: ^0.1.24
+      endpoint-kit: ^0.3.0
+      modules-page-routing: ^0.2.0
     peerDependenciesMeta:
       modules-page-routing:
         optional: true
@@ -943,8 +943,8 @@ packages:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
 
-  endpoint-kit@0.2.0:
-    resolution: {integrity: sha512-qli9+1ZSaKCTg06+H/BgijWOcMcLRYCKheRvVDtTM7awfWrctda+tU84z+oxj6q63hmih2vFvqXnwZ6xTsZgGA==}
+  endpoint-kit@0.3.0:
+    resolution: {integrity: sha512-2Hy2m+m/NVqj6ohrrZkvfDiCZHs7ScsArpOMvE4Kf9+/rC4i5Iw1EnazAZyANHUJbgi+XAy3dpoOtYb2bV9f8A==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -2274,9 +2274,9 @@ snapshots:
       mime-types: 3.0.2
       negotiator: 1.1.0
 
-  auto-types-api@0.0.2(endpoint-kit@0.2.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1)))(modules-page-routing@0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)):
+  auto-types-api@0.1.0(endpoint-kit@0.3.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1)))(modules-page-routing@0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)):
     dependencies:
-      endpoint-kit: 0.2.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1))
+      endpoint-kit: 0.3.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1))
     optionalDependencies:
       modules-page-routing: 0.2.0(react-router@8.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
 
@@ -2413,7 +2413,7 @@ snapshots:
 
   encodeurl@2.0.0: {}
 
-  endpoint-kit@0.2.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1)):
+  endpoint-kit@0.3.0(@tanstack/react-query@5.104.4(@types/react@19.3.0)(react@19.3.1)):
     optionalDependencies:
       '@tanstack/react-query': 5.104.4(@types/react@19.3.0)(react@19.3.1)
 
