@@ -1,12 +1,13 @@
 import { mkdirSync } from "node:fs";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
+import { env } from "~/lib/env.server";
 import * as schema from "./schema";
 
 /**
  * The Drizzle client, server only (`.server` modules never reach the browser bundle).
  *
- * - `DATABASE_URL` set: Postgres through postgres-js. Required in production.
- * - Otherwise, in dev: an embedded Postgres (PGlite) persisted to `.data/pglite`, so no database
+ * - `DATABASE_URL` set: Postgres through postgres-js. Required unless APP_ENV=local.
+ * - Otherwise (local): an embedded Postgres (PGlite) persisted to `.data/pglite`, so no database
  *   service is needed to run the boilerplate. `pnpm db:studio` opens the same directory, and
  *   the two cannot have it open at the same time.
  *
@@ -45,10 +46,9 @@ async function seed(db: Database) {
 }
 
 function connect(): Promise<Database> {
-  const url = process.env.DATABASE_URL;
-  if (url) return connectPostgres(url);
-  if (import.meta.env.DEV) return connectPglite(".data/pglite");
-  throw new Error("DATABASE_URL is not set (e.g. postgres://user:password@host:5432/dbname)");
+  if (env.DATABASE_URL) return connectPostgres(env.DATABASE_URL);
+  if (env.APP_ENV === "local") return connectPglite(".data/pglite");
+  throw new Error(`DATABASE_URL is required when APP_ENV=${env.APP_ENV}`); // unreachable: env.server.ts validates it
 }
 
 // Kept on globalThis so dev-server module reloads reuse the connection instead of opening a new

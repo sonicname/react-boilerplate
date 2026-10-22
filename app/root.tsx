@@ -10,9 +10,18 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { publicEnv } from "./lib/env.server";
 import { QueryProvider } from "./lib/query";
 import { theme } from "./lib/theme";
 import "./app.css";
+
+// The public configuration for the browser: read it anywhere with usePublicEnv() (lib/env.ts).
+export function loader() {
+  return { env: publicEnv };
+}
+
+// It never changes while the app runs, so client navigations need not refetch it.
+export const shouldRevalidate = () => false;
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

@@ -6,3 +6,6 @@ README.md
 .agents
 app/api.gen.ts
 app/api.gen.server.ts
+.data
+# Personal overrides and secrets never enter the image; pass them with `docker run -e`.
+.env

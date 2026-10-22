@@ -19,7 +19,9 @@ RUN pnpm run build
 
 FROM base
 ENV NODE_ENV=production
-COPY package.json pnpm-lock.yaml /app/
+# Which `.env.<APP_ENV>` defaults to use; override per deployment: `docker run -e APP_ENV=staging`.
+ENV APP_ENV=production
+COPY package.json pnpm-lock.yaml .env.* /app/
 # SQL migrations, applied by the app on startup (set DATABASE_URL when running the container).
 COPY drizzle /app/drizzle
 COPY --from=production-dependencies-env /app/node_modules /app/node_modules

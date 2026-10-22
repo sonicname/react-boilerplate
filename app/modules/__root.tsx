@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Anchor,
+  Badge,
   Box,
   Button,
   Container,
@@ -10,6 +11,7 @@ import {
 } from "@mantine/core";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 import { Link, Outlet, useMatch } from "react-router";
+import { usePublicEnv } from "~/lib/env";
 
 const links = [
   { to: "/", label: "Home", end: true },
@@ -26,6 +28,7 @@ export default function RootLayout() {
             {links.map((link) => (
               <NavItem key={link.to} {...link} />
             ))}
+            <EnvBadge />
             <Anchor href="/api/openapi" size="sm" c="dimmed" ml="auto">
               OpenAPI
             </Anchor>
@@ -51,6 +54,17 @@ function NavItem({ to, label, end }: (typeof links)[number]) {
     >
       {label}
     </Button>
+  );
+}
+
+// Reminds everyone which deployment they are looking at; production shows nothing.
+function EnvBadge() {
+  const { APP_ENV } = usePublicEnv();
+  if (APP_ENV === "production") return null;
+  return (
+    <Badge variant="light" color={APP_ENV === "staging" ? "orange" : "gray"} ml="xs">
+      {APP_ENV}
+    </Badge>
   );
 }
 
