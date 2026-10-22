@@ -17,8 +17,8 @@ const GET = api.get(
 // POST /api/todos  { title }
 const POST = api.post(
   { body: NewTodo, response: Todo, errors: { 409: Problem }, summary: "Create a todo", tags: ["todos"] },
-  ({ body, error }) => {
-    if (findTodoByTitle(body.title)) return error(409, { message: `"${body.title}" already exists` });
+  async ({ body, error }) => {
+    if (await findTodoByTitle(body.title)) return error(409, { message: `"${body.title}" already exists` });
     return createTodo(body.title);
   },
 );
